@@ -10,78 +10,90 @@ import util.MqttUtil;
  */
 public class Mqtt {
 
-    private static String password;
+    private static String token;
 
     public static void main(String[] args) throws InterruptedException {
+
+        JLinkClient jlinkClient=new JLinkClient("e0534f3240274897821a126be19b6d46",
+                "0621ef206a1d4cafbe0c5545c3882ea8",
+                "90f8bc17be2a425db6068c749dee4f5d",
+                2);
+        JLinkDevice jLinkDevice = new JLinkDevice("24349dceec6afb13", "admin", "1qa");
+
         // Set Password
-        setPassword();
+        getToken(jlinkClient,jLinkDevice);
         // Get Device Status
-//        queryStatus();
+        queryStatus();
         //Login Device
         login();
         // Get Ability
-//        getAbility();
+        getAbility(jlinkClient,jLinkDevice);
         // KeepAlive
-//        keepAlive();
+        keepAlive(jlinkClient,jLinkDevice);
         // Get Channel Title
-//        getConfig("ChannelTitle");
+        getConfig("ChannelTitle");
         // Get Alarm
-//        getConfig("Alarm.LocalAlarm");
+        getConfig("Alarm.LocalAlarm");
         // NetWork Configuration
-//        getConfig("NetWork.NetCommon");
+        getConfig("NetWork.NetCommon");
         // Location Configuration
-//        getConfig("General.Location");
+        getConfig("General.Location");
         // Capture
-//        getCapture();
+        getCapture();
         //Low-power Device Wakeup
-//        wakeup();
+        wakeup();
         //Get LiveStream
-//        livestream();
+        livestream();
         //Get Device Info
-//        getinfo();
+        getinfo();
         //Set Configuration
-//        setconfig();
+        setconfig();
         //Operate Device
-//        opdev();
+        opdev();
         //Device UserManage
-//        usermanage();
+        usermanage();
 
     }
 
-    private static void setPassword() {
-        password = CommonUtil.getPassword();
+    public static String getToken(JLinkClient client,JLinkDevice device) {
+        token = CommonUtil.getToken(client, device);
+        return token;
     }
 
-    private static void queryStatus() throws InterruptedException {
-        String pubTopic = "v1/status/query/" + password;
-        String subTopic = pubTopic + "/result";
+    public static String createSubTopic(String pubTopic){
+        return pubTopic+"/result";
+    }
+
+    public static void queryStatus() throws InterruptedException {
+        String pubTopic = "v1/status/query/" + token;
+        String subTopic = createSubTopic(pubTopic);
         String content = "";
-        MqttUtil.mqtt(pubTopic, subTopic, content, password);
+        MqttUtil.mqtt(pubTopic, subTopic, content, token);
     }
 
-    private static void login() throws InterruptedException {
-        String pubTopic = "v1/device/login/" + password;
-        String subTopic = pubTopic + "/result";
+    public static void login() throws InterruptedException {
+        String pubTopic = "v1/device/login/" + token;
+        String subTopic = createSubTopic(pubTopic);
         String content = "{\n" +
                 "\t\"EncryptType\": \"MD5\",\n" +
                 "\t\"LoginType\": \"DVRIP-Web\",\n" +
-                "\t\"PassWord\": \"1qa\",\n" +
+                "\t\"PassWord\": \"\",\n" +
                 "\t\"UserName\": \"admin\",\n" +
                 "\t\"Name\": \"generalinfo\"\n" +
                 "}";
-        MqttUtil.mqtt(pubTopic, subTopic, content, password);
+        MqttUtil.mqtt(pubTopic, subTopic, content, token);
     }
 
-    private static void wakeup() throws InterruptedException {
-        String pubTopic = "v1/device/wakeup/" + password;
-        String subTopic = pubTopic;
+    public static void wakeup() throws InterruptedException {
+        String pubTopic = "v1/device/wakeup/" + token;
+        String subTopic = createSubTopic(pubTopic);
         String content = "";
-        MqttUtil.mqtt(pubTopic, subTopic, content, password);
+        MqttUtil.mqtt(pubTopic, subTopic, content, token);
     }
 
-    private static void livestream() throws InterruptedException {
-        String pubTopic = "v1/device/livestream/" + password;
-        String subTopic = pubTopic;
+    public static void livestream() throws InterruptedException {
+        String pubTopic = "v1/device/livestream/" + token;
+        String subTopic = createSubTopic(pubTopic);
         String content = "{\n" +
                 "    \"mediaType\": \"hls\",\n" +
                 "    \"channel\": \"0\",\n" +
@@ -90,84 +102,84 @@ public class Mqtt {
                 "    \"username\": \"username\",\n" +
                 "    \"devPwd\": \"password\"\n" +
                 "}";
-        MqttUtil.mqtt(pubTopic, subTopic, content, password);
+        MqttUtil.mqtt(pubTopic, subTopic, content, token);
     }
 
-    private static void getinfo() throws InterruptedException {
-        String pubTopic = "v1/device/getinfo/" + password;
-        String subTopic = pubTopic;
+    public static void getinfo() throws InterruptedException {
+        String pubTopic = "v1/device/getinfo/" + token;
+        String subTopic = createSubTopic(pubTopic);
         String content = "";
-        MqttUtil.mqtt(pubTopic, subTopic, content, password);
+        MqttUtil.mqtt(pubTopic, subTopic, content, token);
     }
 
-    private static void setconfig() throws InterruptedException {
-        String pubTopic = "v1/device/setconfig/" + password;
-        String subTopic = pubTopic;
+    public static void setconfig() throws InterruptedException {
+        String pubTopic = "v1/device/setconfig/" + token;
+        String subTopic = createSubTopic(pubTopic);
         String content = "{\n" +
                 "    \"Name\": \"hls\",\n" +
                 "    \"ChannelTitle\": [\n" +
                 "        \"cha\"\n" +
                 "    ]\n" +
                 "}";
-        MqttUtil.mqtt(pubTopic, subTopic, content, password);
+        MqttUtil.mqtt(pubTopic, subTopic, content, token);
     }
 
-    private static void opdev() throws InterruptedException {
-        String pubTopic = "v1/device/opdev/" + password;
-        String subTopic = pubTopic;
+    public static void opdev() throws InterruptedException {
+        String pubTopic = "v1/device/opdev/" + token;
+        String subTopic = createSubTopic(pubTopic);
         String content = "{\n" +
                 "    \"Name\": \"hls\"\n" +
                 "}";
-        MqttUtil.mqtt(pubTopic, subTopic, content, password);
+        MqttUtil.mqtt(pubTopic, subTopic, content, token);
     }
 
-    private static void usermanage() throws InterruptedException {
-        String pubTopic = "v1/device/usermanage/" + password;
-        String subTopic = pubTopic;
+    public static void usermanage() throws InterruptedException {
+        String pubTopic = "v1/device/usermanage/" + token;
+        String subTopic = createSubTopic(pubTopic);
         String content = "{\n" +
                 "    \"Name\": \"hls\"\n" +
                 "}";
-        MqttUtil.mqtt(pubTopic, subTopic, content, password);
+        MqttUtil.mqtt(pubTopic, subTopic, content, token);
     }
 
-    public static void getAbility() throws InterruptedException {
-        String password = CommonUtil.getPassword();
+    public static void getAbility(JLinkClient client,JLinkDevice device) throws InterruptedException {
+        String password = getToken(client, device);
         String pubTopic = "v1/device/getability/" + password;
-        String subTopic = pubTopic;
+        String subTopic = createSubTopic(pubTopic);
         String content = "{\n" +
                 "    \"Name\":\"SystemFunction\"\n" +
                 "}";
         MqttUtil.mqtt(pubTopic, subTopic, content, password);
     }
 
-    public static void keepAlive() throws InterruptedException {
-        String password = CommonUtil.getPassword();
+    public static void keepAlive(JLinkClient client,JLinkDevice device) throws InterruptedException {
+        String password = getToken(client,device);
         String pubTopic = "v1/device/keepalive/" + password;
-        String subTopic = pubTopic;
+        String subTopic = createSubTopic(pubTopic);
         String content = "{\n" +
                 "        \"Name\":\"KeepAlive\"\n" +
                 "    }";
         MqttUtil.mqtt(pubTopic, subTopic, content, password);
     }
 
-    private static void getConfig(String name) throws InterruptedException {
-        String pubTopic = "v1/device/getconfig/" + password;
-        String subTopic = pubTopic;
+    public static void getConfig(String name) throws InterruptedException {
+        String pubTopic = "v1/device/getconfig/" + token;
+        String subTopic = createSubTopic(pubTopic);
         String content = "{\n" +
                 "        \"Name\":\"" + name + "\"\n" +
                 "    }";
-        MqttUtil.mqtt(pubTopic, subTopic, content, password);
+        MqttUtil.mqtt(pubTopic, subTopic, content, token);
     }
 
-    private static void getCapture() throws InterruptedException {
-        String pubTopic = "v1/device/capture/" + password;
-        String subTopic = pubTopic;
+    public static void getCapture() throws InterruptedException {
+        String pubTopic = "v1/device/capture/" + token;
+        String subTopic = createSubTopic(pubTopic);
         String content = "{\n" +
                 "    \"Name\":\"OPSNAP\",\n" +
                 "    \"OPSNAP\":{\n" +
                 "        \"Channel\":0\n" +
                 "    }\n" +
                 "}";
-        MqttUtil.mqtt(pubTopic, subTopic, content, password);
+        MqttUtil.mqtt(pubTopic, subTopic, content, token);
     }
 }

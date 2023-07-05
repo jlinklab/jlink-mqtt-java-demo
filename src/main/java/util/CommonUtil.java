@@ -5,6 +5,8 @@ import cn.hutool.http.Header;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
+import mqtt.JLinkClient;
+import mqtt.JLinkDevice;
 
 import java.nio.charset.StandardCharsets;
 
@@ -15,27 +17,22 @@ import java.nio.charset.StandardCharsets;
  */
 public class CommonUtil {
 
-    public static String getPassword() {
+
+    public static String getToken(JLinkClient client, JLinkDevice device) {
+
         String url = "https://pub-token.xmeye.net/reqToken";
-        String SN = "24349dceec6afb13";
         String SEVICE = "MQTT";
-        String USER = "admin";
-        String PASS = "1qa";
-        String UUID = "e0534f3240274897821a126be19b6d46";
-        String APPkEY = "0621ef206a1d4cafbe0c5545c3882ea8";
-        String SECkEY = "90f8bc17be2a425db6068c749dee4f5d";
-        Integer MC = 2;
         String tm = getTimMillis();
-        String sign = getEncryptStr(UUID, APPkEY, SECkEY, tm, MC);
+        String sign = getEncryptStr(client.getUuid(), client.getAppKey(), client.getAppSecret(), tm, client.getMoveCard());
         JSONObject jsonObject = new JSONObject();
-        jsonObject.putOnce("sn", SN);
+        jsonObject.putOnce("sn", device.getmDeviceSn());
         jsonObject.putOnce("service", SEVICE);
-        jsonObject.putOnce("uuid", UUID);
-        jsonObject.putOnce("appkey", APPkEY);
+        jsonObject.putOnce("uuid", client.getUuid());
+        jsonObject.putOnce("appkey", client.getAppKey());
         jsonObject.putOnce("tm", tm);
         jsonObject.putOnce("sign", sign);
-        jsonObject.putOnce("user", USER);
-        jsonObject.putOnce("pass", PASS);
+        jsonObject.putOnce("user", device.getmDeviceUser());
+        jsonObject.putOnce("pass", device.getmDevicePass());
         String password = HttpRequest.post(url).header(Header.CONTENT_TYPE, "application/json")
                 .body(jsonObject.toString()).execute().body();
         return JSONUtil.parseObj(password).getStr("token");
